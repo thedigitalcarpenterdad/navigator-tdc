@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.tdc.navigator">
+
+    <!-- Android Automotive OS Requirements -->
+    <uses-feature
+        android:name="android.hardware.type.automotive"
+        android:required="true" />
+    
+    <!-- Vehicle System Permissions -->
+    <uses-permission android:name="android.car.permission.CAR_CLIMATE" />
+    <uses-permission android:name="android.car.permission.CAR_DOORS" />
+    <uses-permission android:name="android.car.permission.CAR_WINDOWS" />
+    <uses-permission android:name="android.car.permission.CAR_SEATS" />
+    <uses-permission android:name="android.car.permission.CAR_LIGHTS" />
+    <uses-permission android:name="android.car.permission.CAR_MIRRORS" />
+    <uses-permission android:name="android.car.permission.CAR_INFO" />
+    <uses-permission android:name="android.car.permission.CAR_ENGINE_DETAILED" />
+    <uses-permission android:name="android.car.permission.CAR_POWERTRAIN" />
+    
+    <!-- Audio and Voice Permissions -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.car.permission.CAR_CONTROL_AUDIO_VOLUME" />
+    
+    <!-- Network for FordPass/Lincoln Connect -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <!-- Wake Word Detection -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+
+    <application
+        android:name=".TDCNavigatorApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.TDCNavigator"
+        tools:targetApi="31">
+
+        <!-- Main Car App Service -->
+        <service
+            android:name=".service.TDCCarAppService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.car.app.CarAppService" />
+                <category android:name="androidx.car.app.category.NAVIGATION" />
+            </intent-filter>
+        </service>
+
+        <!-- Wake Word Detection Service -->
+        <service
+            android:name=".service.WakeWordDetectionService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
+
+        <!-- Vehicle Control Service -->
+        <service
+            android:name=".service.VehicleControlService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <!-- Main Activity (for setup and configuration) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.TDCNavigator.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Voice Assistant Activity -->
+        <activity
+            android:name=".ui.VoiceAssistantActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.TDCNavigator.VoiceOverlay" />
+
+    </application>
+</manifest>

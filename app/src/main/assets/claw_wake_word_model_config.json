@@ -1,0 +1,204 @@
+{
+  "model_name": "claw_wake_word_detector",
+  "version": "2.0.0",
+  "wake_word": "claw",
+  "model_type": "binary_classifier",
+  "description": "Optimized TensorFlow Lite model for 'Claw' wake word detection in automotive environment",
+  
+  "audio_config": {
+    "sample_rate": 16000,
+    "frame_length_ms": 64,
+    "hop_length_ms": 32,
+    "mel_bins": 40,
+    "sequence_length": 80,
+    "window_size_ms": 1300
+  },
+  
+  "model_config": {
+    "input_shape": [1, 80, 40],
+    "output_shape": [1, 2],
+    "quantization": "int8",
+    "confidence_threshold": 0.75,
+    "classes": [
+      {
+        "id": 0,
+        "name": "claw",
+        "description": "Target wake word 'Claw'"
+      },
+      {
+        "id": 1,
+        "name": "background",
+        "description": "Background noise, speech, and non-target sounds"
+      }
+    ]
+  },
+  
+  "training_config": {
+    "target_word": "claw",
+    "positive_samples": [
+      "claw",
+      "CLAW",
+      "Claw",
+      "claw!",
+      "claw?",
+      "claw,"
+    ],
+    "negative_samples": [
+      "call", 
+      "car",
+      "close",
+      "clear",
+      "cool",
+      "law",
+      "raw",
+      "saw",
+      "clay",
+      "play",
+      "hey",
+      "okay",
+      "background_noise",
+      "engine_noise",
+      "road_noise",
+      "conversation",
+      "music",
+      "radio"
+    ],
+    "automotive_environment": {
+      "noise_types": [
+        "engine_idle",
+        "highway_driving", 
+        "city_traffic",
+        "wind_noise",
+        "hvac_noise",
+        "radio_background"
+      ],
+      "speaker_distances": ["30cm", "60cm", "90cm"],
+      "microphone_positions": ["dashboard", "overhead", "door"]
+    }
+  },
+  
+  "performance_targets": {
+    "detection_latency_ms": 200,
+    "true_positive_rate": 0.95,
+    "false_positive_rate": 0.01,
+    "model_size_kb": 500,
+    "inference_time_ms": 50,
+    "memory_usage_mb": 10
+  },
+  
+  "deployment_config": {
+    "platform": "android_automotive",
+    "target_devices": ["2025_lincoln_navigator_sync4a"],
+    "tensorflow_lite_version": "2.14.0",
+    "optimization": ["quantization", "pruning"],
+    "hardware_acceleration": ["cpu", "gpu_delegate"]
+  },
+  
+  "validation": {
+    "test_scenarios": [
+      {
+        "name": "quiet_cabin",
+        "description": "Vehicle parked, engine off, minimal noise",
+        "target_accuracy": 0.98
+      },
+      {
+        "name": "highway_driving", 
+        "description": "Highway speeds, road and wind noise",
+        "target_accuracy": 0.92
+      },
+      {
+        "name": "city_driving",
+        "description": "Stop-and-go traffic, varied noise levels",
+        "target_accuracy": 0.90
+      },
+      {
+        "name": "radio_playing",
+        "description": "Music or talk radio at normal volume",
+        "target_accuracy": 0.88
+      },
+      {
+        "name": "conversation",
+        "description": "Passengers talking in vehicle",
+        "target_accuracy": 0.85
+      }
+    ]
+  },
+  
+  "safety_considerations": {
+    "false_positive_mitigation": [
+      "High confidence threshold (0.75+)",
+      "Temporal consistency checks",
+      "Rate limiting for repeated detections"
+    ],
+    "false_negative_mitigation": [
+      "Multiple pronunciation variations",
+      "Noise-robust feature extraction",
+      "Automotive-specific training data"
+    ],
+    "automotive_safety": [
+      "No interference with vehicle systems",
+      "Fail-safe operation during system errors",
+      "Emergency stop command recognition"
+    ]
+  },
+  
+  "model_architecture": {
+    "type": "CNN + RNN",
+    "layers": [
+      {
+        "type": "conv2d",
+        "filters": 32,
+        "kernel_size": [3, 3],
+        "activation": "relu"
+      },
+      {
+        "type": "max_pooling2d", 
+        "pool_size": [2, 2]
+      },
+      {
+        "type": "conv2d",
+        "filters": 64,
+        "kernel_size": [3, 3], 
+        "activation": "relu"
+      },
+      {
+        "type": "max_pooling2d",
+        "pool_size": [2, 2]
+      },
+      {
+        "type": "lstm",
+        "units": 128,
+        "return_sequences": false
+      },
+      {
+        "type": "dense",
+        "units": 64,
+        "activation": "relu"
+      },
+      {
+        "type": "dropout",
+        "rate": 0.3
+      },
+      {
+        "type": "dense", 
+        "units": 2,
+        "activation": "softmax"
+      }
+    ]
+  },
+  
+  "preprocessing": {
+    "mel_filterbank": {
+      "n_mels": 40,
+      "fmin": 80,
+      "fmax": 8000
+    },
+    "normalization": "per_feature",
+    "augmentation": [
+      "time_stretching",
+      "pitch_shifting", 
+      "noise_injection",
+      "volume_variation"
+    ]
+  }
+}
